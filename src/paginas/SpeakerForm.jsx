@@ -12,7 +12,7 @@ const SpeakerForm = () => {
   const navigate = useNavigate();
   const { token} = useAuthStore();
 
-  const [auditorio, setAuditorio] = useState({
+  const [speaker, setSpeaker] = useState({
         cedula: "",
         nombre: "",
         apellido: "",
@@ -27,7 +27,7 @@ const SpeakerForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAuditorio((prev) => ({
+    setSpeaker((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -36,16 +36,19 @@ const SpeakerForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post(`/speakers/register`, auditorio, {
+      const response = await axiosInstance.post(`/speakers/register`, speaker, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       toast.success("Ponente creado exitosamente");
-      navigate(`/auditorium/${auditorio.codigo}`); 
+      navigate(`/dashboard/speakers/${speaker.cedula}`);
     } catch (error) {
       console.error("Error al crear el ponente:", error);
-      toast.error("Algo salió mal. No se pudo actualizar.");
+      const errorMessages = error.response.data.errors.map((err) => err.message).join("\n");
+      
+      // Mostramos el toast con todos los errores
+      toast.error(errorMessages);
     }
   };
 
@@ -55,12 +58,12 @@ const SpeakerForm = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <Label htmlFor="codigo">Cedula</Label>
+          <Label htmlFor="cedula">Cedula</Label>
           <Input
-            id="codigo"
-            name="codigo"
+            id="cedula"
+            name="cedula"
             type="text"
-            value={auditorio.codigo}
+            value={speaker.cedula}
             onChange={handleChange}
             required
           />
@@ -72,42 +75,42 @@ const SpeakerForm = () => {
             id="nombre"
             name="nombre"
             type="text"
-            value={auditorio.nombre}
+            value={speaker.nombre}
             onChange={handleChange}
             required
           />
         </div>
 
         <div className="mb-4">
-          <Label htmlFor="ubicacion">Apellido</Label>
+          <Label htmlFor="apellido">Apellido</Label>
           <Input
-            id="ubicacion"
-            name="ubicacion"
+            id="apellido"
+            name="apellido"
             type="text"
-            value={auditorio.ubicacion}
+            value={speaker.apellido}
             onChange={handleChange}
             required
           />
         </div>
 
         <div className="mb-4">
-          <Label htmlFor="capacidad">Email</Label>
+          <Label htmlFor="email">Email</Label>
           <Input
-            id="capacidad"
-            name="capacidad"
-            type="number"
-            value={auditorio.capacidad}
+            id="email"
+            name="email"
+            type="email"
+            value={speaker.email}
             onChange={handleChange}
             required
           />
         </div>
 
         <div className="mb-4">
-          <Label htmlFor="descripcion">Telefono</Label>
-          <Textarea
-            id="descripcion"
-            name="descripcion"
-            value={auditorio.descripcion}
+          <Label htmlFor="telefono">Telefono</Label>
+          <Input
+            id="telefono"
+            name="telefono"
+            value={speaker.telefono}
             onChange={handleChange}
             required
           />
@@ -134,9 +137,9 @@ const SpeakerForm = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
             required
           >
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-            <option value="otro">Otro</option>
+            <option value="">Selecciona un género</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
           </select>
         </div>
 
